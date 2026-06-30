@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALE — PORTFOLIO</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root{
+  --bg: #0a0a0a;
+  --bg-2: #131311;
+  --paper: #ece7da;
+  --red: #ff2b1f;
+  --yellow: #ffcf00;
+  --muted: #6b675c;
+  --line: #2a2a26;
+  --ghost: rgba(236,231,218,0.05);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--paper);
+  font-family:'Space Mono', monospace;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* scanlines overlay */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:999;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode:overlay;
+}
+
+/* vignette / noise tint */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:998;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+}
+
+a{color:inherit; text-decoration:none;}
+
+::selection{background:var(--red); color:var(--bg);}
+
+/* ---------- NAV ---------- */
+nav{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:500;
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto;
+  align-items:center;
+  gap:24px;
+  padding:24px 40px;
+  font-size:12px;
+  letter-spacing:0.04em;
+  border-bottom:1px solid rgba(236,231,218,0.08);
+  background:linear-gradient(to bottom, rgba(10,10,10,0.92), rgba(10,10,10,0.4));
+}
+nav .brand{font-family:'Space Mono', monospace; font-weight:700; font-size:13px;}
+nav .brand span{color:var(--red);}
+nav .dot{
+  width:8px; height:8px;
+  background:var(--red);
+  justify-self:center;
+}
+nav .links{justify-self:center; color:var(--muted); transition:color .25s;}
+nav .links:hover{color:var(--yellow);}
+nav .icons{display:flex; gap:18px; justify-self:end; color:var(--muted);}
+nav .icons a{transition:color .25s;}
+nav .icons a:hover{color:var(--red);}
+@media (max-width:760px){
+  nav{grid-template-columns:1fr auto auto; padding:18px 22px;}
+  nav .links{display:none;}
+}
+
+/* ---------- HERO ---------- */
+.hero{
+  min-height:100vh;
+  position:relative;
+  padding:0 40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding-bottom:0;
+  overflow:hidden;
+}
+
+/* crosshair lines */
+.crosshair-v{
+  position:absolute;
+  top:0; bottom:0;
+  left:42%;
+  width:1px;
+  background:linear-gradient(to bottom, transparent, rgba(255,43,31,0.55) 12%, rgba(255,43,31,0.55) 88%, transparent);
+  z-index:2;
+}
+.crosshair-h{
+  position:absolute;
+  left:0; right:0;
+  top:40%;
+  height:1px;
+  background:linear-gradient(to right, transparent, rgba(255,207,0,0.5) 8%, rgba(255,207,0,0.5) 92%, transparent);
+  z-index:2;
+}
+.crosshair-tag{
+  position:absolute;
+  top:40%; left:42%;
+  transform:translate(10px,-26px);
+  font-size:10px;
+  letter-spacing:0.1em;
+  color:var(--red);
+  z-index:3;
+}
+
+/* ghost watermark text */
+.ghost-text{
+  position:absolute;
+  left:6%;
+  bottom:6%;
+  font-family:'Archivo Black', sans-serif;
+  font-size:clamp(60px,16vw,220px);
+  line-height:0.85;
+  color:var(--ghost);
+  white-space:nowrap;
+  z-index:1;
+  pointer-events:none;
+  letter-spacing:-0.01em;
+}
+
+.hero-caption{
+  position:relative;
+  z-index:3;
+  max-width:300px;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.6;
+  color:var(--red);
+  margin-left:calc(42% + 22px);
+  margin-top:160px;
+}
+
+.hero-caption.lower{
+  color:var(--yellow);
+  margin-bottom:18px;
+  margin-top:0;
+}
+
+.wordmark{
+  position:relative;
+  z-index:3;
+  font-family:'Archivo Black', sans-serif;
+  font-size:clamp(58px, 13vw, 175px);
+  line-height:0.85;
+  letter-spacing:-0.02em;
+  color:var(--paper);
+  margin-bottom:0.18em;
+  text-transform:lowercase;
+}
+.wordmark .accent{color:var(--red);}
+
+.hero-bottom{
+  position:relative;
+  z-index:3;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  padding:22px 0 30px;
+  border-top:1px solid rgba(236,231,218,0.1);
+  font-size:11px;
+  letter-spacing:0.06em;
+  color:var(--muted);
+}
+.hero-bottom .scroll-hint{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.hero-bottom .bar{
+  width:1px; height:24px;
+  background:linear-gradient(to bottom, var(--red), transparent);
+  animation:scrollMove 1.8s infinite ease-in-out;
+}
+@keyframes scrollMove{
+  0%,100%{opacity:0.3;}
+  50%{opacity:1;}
+}
+
+@media (max-width:760px){
+  .crosshair-v{left:18%;}
+  .crosshair-tag{left:18%;}
+  .hero-caption{margin-left:0; margin-top:120px; max-width:220px;}
+  .ghost-text{font-size:clamp(40px,18vw,90px); left:4%;}
+  .hero{padding:0 22px;}
+}
+
+/* ---------- SECTION HEADERS ---------- */
+.section{padding:120px 40px;}
+.section-head{
+  display:flex;
+  align-items:baseline;
+  gap:18px;
+  margin-bottom:64px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:20px;
+}
+.section-head .num{
+  font-family:'Space Mono', monospace;
+  font-weight:700;
+  color:var(--red);
+  font-size:13px;
+}
+.section-head h2{
+  font-family:'Archivo Black', sans-serif;
+  font-size:clamp(28px,4vw,42px);
+  text-transform:lowercase;
+  letter-spacing:-0.01em;
+}
+.section-head .desc{
+  margin-left:auto;
+  font-size:12px;
+  color:var(--muted);
+  max-width:280px;
+  text-align:right;
+}
+
+/* ---------- PROJECTS LIST ---------- */
+.proj-list{
+  display:flex;
+  flex-direction:column;
+  border-top:1px solid var(--line);
+}
+.proj-row{
+  display:grid;
+  grid-template-columns:70px 1fr 200px;
+  gap:24px;
+  align-items:center;
+  padding:34px 0;
+  border-bottom:1px solid var(--line);
+  cursor:pointer;
+  position:relative;
+}
+.proj-row .ch{
+  font-size:11px;
+  letter-spacing:0.1em;
+  color:var(--muted);
+}
+.proj-row .ch .live{display:block; margin-top:6px; color:var(--yellow);}
+
+.proj-row .title-wrap{position:relative;}
+.proj-row h3{
+  font-family:'Archivo Black', sans-serif;
+  font-size:clamp(26px,4.6vw,52px);
+  text-transform:lowercase;
+  letter-spacing:-0.01em;
+  position:relative;
+  width:fit-content;
+}
+.proj-row h3 .base{position:relative; z-index:2;}
+.proj-row h3 .ghost{
+  position:absolute; top:0; left:0;
+  z-index:1;
+  opacity:0;
+  transition:opacity .15s, transform .15s;
+}
+.proj-row:hover h3 .ghost.r{color:var(--red); opacity:0.85; transform:translate(4px,-3px);}
+.proj-row:hover h3 .ghost.y{color:var(--yellow); opacity:0.85; transform:translate(-4px,3px);}
+
+.proj-row p{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--muted);
+  max-width:46ch;
+}
+
+.proj-row .meta{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:12px;
+}
+.proj-row .tags{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+.proj-row .tags span{
+  font-size:10px;
+  letter-spacing:0.05em;
+  border:1px solid var(--line);
+  padding:4px 9px;
+  color:var(--muted);
+  transition:border-color .25s, color .25s;
+}
+.proj-row:hover .tags span{border-color:var(--red); color:var(--paper);}
+.proj-row .arrow{
+  font-size:18px;
+  color:var(--red);
+  transition:transform .25s;
+}
+.proj-row:hover .arrow{transform:translate(5px,-5px);}
+
+@media (max-width:760px){
+  .grid{grid-template-columns:1fr;}
+  .section{padding:80px 22px;}
+  nav{padding:18px 22px;}
+  .proj-row{grid-template-columns:1fr; gap:10px; padding:26px 0;}
+  .proj-row .meta{align-items:flex-start; flex-direction:row; justify-content:space-between; width:100%;}
+  .hero{padding:0 22px;}
+}
+
+/* ---------- ABOUT ---------- */
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:60px;
+  align-items:start;
+}
+.about-grid p{
+  font-size:15px;
+  line-height:1.9;
+  color:var(--muted);
+  margin-bottom:18px;
+}
+.about-grid p strong{color:var(--paper);}
+.stack-list{display:flex; flex-direction:column; gap:0;}
+.stack-list .row{
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.stack-list .row span:first-child{color:var(--paper); letter-spacing:0.02em;}
+.stack-list .row span:last-child{color:var(--muted);}
+@media (max-width:760px){.about-grid{grid-template-columns:1fr;}}
+
+/* ---------- CONTACT / FOOTER ---------- */
+footer{
+  padding:100px 40px 50px;
+  border-top:1px solid var(--line);
+}
+.contact-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  flex-wrap:wrap;
+  gap:30px;
+}
+.contact-row h2{
+  font-family:'Archivo Black', sans-serif;
+  font-size:clamp(32px,6vw,64px);
+  text-transform:lowercase;
+  line-height:1;
+}
+.contact-row h2 a{
+  background:linear-gradient(90deg, var(--red), var(--yellow));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.contact-links{display:flex; gap:30px; font-size:12px; letter-spacing:0.05em;}
+.contact-links a{color:var(--muted); border-bottom:1px solid transparent; padding-bottom:3px; transition:.25s;}
+.contact-links a:hover{color:var(--paper); border-color:var(--red);}
+.foot-bottom{
+  margin-top:60px;
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:0.03em;
+  flex-wrap:wrap;
+  gap:10px;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">ale<span>.</span>dev</div>
+  <div class="dot"></div>
+  <a class="links" href="#info">about</a>
+  <div class="icons">
+    <a href="#" aria-label="github">gh</a>
+    <a href="#" aria-label="instagram">ig</a>
+    <a href="mailto:tu@email.com" aria-label="mail">mail</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="crosshair-v"></div>
+  <div class="crosshair-h"></div>
+  <div class="crosshair-tag">// 42.0, 40.0</div>
+  <div class="ghost-text">creative coder</div>
+
+  <div class="hero-caption">otro programador<br>trasnochado detrás<br>de la pantalla</div>
+
+  <h1 class="wordmark">ale<span class="accent">.</span>dev</h1>
+
+  <div class="hero-caption lower">scroll, glitch<br>y salí.</div>
+
+  <div class="hero-bottom">
+    <span>creative coding / glitch art</span>
+    <div class="scroll-hint"><div class="bar"></div>scroll</div>
+    <span>santiago, cl — 2026</span>
+  </div>
+</section>
+
+<section class="section" id="proyectos">
+  <div class="section-head">
+    <span class="num">01 /</span>
+    <h2>proyectos</h2>
+    <span class="desc">selección de trabajos recientes — editá el array <code>projects</code> en el js para sumar los tuyos.</span>
+  </div>
+
+  <div class="proj-list" id="grid"></div>
+</section>
+
+<section class="section" id="info">
+  <div class="section-head">
+    <span class="num">02 /</span>
+    <h2>info</h2>
+    <span class="desc">quién hace esto y con qué.</span>
+  </div>
+  <div class="about-grid">
+    <div>
+      <p><strong>hola, soy ale.</strong> Trabajo en la intersección entre arte generativo y código —
+      me interesa lo que pasa cuando una imagen se rompe a propósito: glitch, slicing de video,
+      desfases de color, ruido. Uso el navegador como medio principal.</p>
+      <p>La mayoría de estos proyectos nacen del editor de p5.js y terminan desplegados en GitHub Pages.
+      Me gusta iterar rápido, ver el resultado en tiempo real y empujar las herramientas hasta donde
+      empiezan a fallar de forma interesante.</p>
+    </div>
+    <div class="stack-list">
+      <div class="row"><span>lenguajes</span><span>JavaScript, GLSL básico</span></div>
+      <div class="row"><span>librerías</span><span>p5.js, ml5.js, MediaPipe</span></div>
+      <div class="row"><span>áreas</span><span>Glitch art, generativo, interacción</span></div>
+      <div class="row"><span>deploy</span><span>GitHub Pages</span></div>
+      <div class="row"><span>editor</span><span>editor.p5js.org / VS Code</span></div>
+    </div>
+  </div>
+</section>
+
+<footer id="contacto">
+  <div class="contact-row">
+    <h2><a href="mailto:tu@email.com">hablemos →</a></h2>
+    <div class="contact-links">
+      <a href="#">github</a>
+      <a href="#">instagram</a>
+      <a href="mailto:tu@email.com">email</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 ale — hecho con ruido y código.</span>
+    <span>santiago, chile</span>
+  </div>
+</footer>
+
+<script>
+// ---------------------------------------------------------
+// EDITÁ ESTE ARRAY PARA AGREGAR / CAMBIAR TUS PROYECTOS
+// Cada objeto = una tarjeta. "live" marca si está en producción.
+// ---------------------------------------------------------
+const projects = [
+  {
+    ch: "ch 01",
+    live: true,
+    title: "REDISEÑO VINILO",
+    desc: "Efectos de glitch en tiempo real sobre video: slice, RGB shift, noise, scanlines y conversión a ASCII.",
+    tags: ["p5.js", "canvas", "real-time"],
+    url: "#"
+  },
+  {
+    ch: "ch 02",
+    live: true,
+    title: "FANZINE AKRIILA",
+    desc: "Control del efecto Slice con gestos de mano (puño → mano abierta) usando ml5.js.",
+    tags: ["ml5.js", "hand tracking", "interactivo"],
+    url: "#"
+  },
+  {
+    ch: "ch 03",
+    live: false,
+    title: "CUSTOM CD",
+    desc: "Animación interactiva con estados, caminata y transiciones disparadas por scroll.",
+    tags: ["p5.js", "state machine", "scroll"],
+    url: "#"
+  },
+  {
+    ch: "ch 04",
+    live: false,
+    title: "PLAQUETTE TIPOGRÁFICO",
+    desc: "Reemplazá este bloque por la descripción de tu próximo experimento.",
+    tags: ["tag 1", "tag 2"],
+    url: "#"
+  }
+ {
+    ch: "ch 05",
+    live: false,
+    title: "INTERACCIÓN AUDIVISUAL P5.JS",
+    desc: "Reemplazá este bloque por la descripción de tu próximo experimento.",
+    tags: ["tag 1", "tag 2"],
+    url: "#"
+  }
+
+];
+
+const grid = document.getElementById('grid');
+
+function renderCards(){
+  grid.innerHTML = projects.map(p => `
+    <div class="proj-row" onclick="${p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : ''}">
+      <div class="ch">
+        <span>${p.ch}</span>
+        <span class="${p.live ? 'live' : ''}">${p.live ? '● live' : '○ draft'}</span>
+      </div>
+      <div class="title-wrap">
+        <h3>
+          <span class="ghost r">${p.title}</span>
+          <span class="ghost y">${p.title}</span>
+          <span class="base">${p.title}</span>
+        </h3>
+        <p>${p.desc}</p>
+      </div>
+      <div class="meta">
+        <div class="tags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+  `).join('');
+}
+renderCards();
+</script>
+
+</body>
+</html>
