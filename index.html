@@ -320,6 +320,31 @@ nav .icons a:hover{color:var(--red);}
   transition:transform .25s;
 }
 .proj-row:hover .arrow{transform:translate(5px,-5px);}
+.proj-row.has-embed .arrow{transition:transform .25s;}
+.proj-row.has-embed.open .arrow{transform:rotate(90deg);}
+.proj-row.has-embed:hover .arrow{transform:translate(5px,-5px);}
+.proj-row.has-embed.open:hover .arrow{transform:rotate(90deg);}
+
+.embed-wrap{
+  max-height:0;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+  transition:max-height .4s ease;
+}
+.embed-wrap.open{max-height:360px;}
+.embed-inner{
+  padding:24px 0 34px;
+  display:flex;
+  justify-content:center;
+}
+.embed-inner iframe{
+  max-width:100%;
+  border:1px solid var(--line);
+  filter:grayscale(0.15);
+}
+@media (max-width:760px){
+  .embed-inner iframe{width:100%; height:280px;}
+}
 
 @media (max-width:760px){
   .grid{grid-template-columns:1fr;}
@@ -493,7 +518,8 @@ const projects = [
     title: "fanzine akriila",
     desc: "Control del efecto Slice con gestos de mano (puño → mano abierta) usando ml5.js.",
     tags: ["ml5.js", "hand tracking", "interactivo"],
-    url: "#"
+    url: "#",
+    embed: '<iframe src="https://www.behance.net/embed/project/235510581?ilo0=1" height="316" width="404" allowfullscreen lazyload frameborder="0" allow="clipboard-write" refererPolicy="strict-origin-when-cross-origin"></iframe>'
   },
   {
     ch: "03",
@@ -524,8 +550,14 @@ const projects = [
 const grid = document.getElementById('grid');
 
 function renderCards(){
-  grid.innerHTML = projects.map(p => `
-    <div class="proj-row" onclick="${p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : ''}">
+  grid.innerHTML = projects.map((p, i) => {
+    const hasEmbed = !!p.embed;
+    const rowClick = hasEmbed
+      ? `toggleEmbed(${i})`
+      : (p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : '');
+
+    const row = `
+    <div class="proj-row${hasEmbed ? ' has-embed' : ''}" id="row-${i}" onclick="${rowClick}">
       <div class="ch">
         <span>${p.ch}</span>
         <span class="${p.live ? 'live' : ''}">${p.live ? '● live' : '○ draft'}</span>
@@ -542,10 +574,24 @@ function renderCards(){
         <div class="tags">${p.tags.map(t => `<span>${t}</span>`).join('')}</div>
         <span class="arrow">→</span>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+
+    const embedPanel = hasEmbed
+      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.embed}</div></div>`
+      : '';
+
+    return row + embedPanel;
+  }).join('');
 }
 renderCards();
+
+function toggleEmbed(i){
+  const row = document.getElementById(`row-${i}`);
+  const panel = document.getElementById(`embed-${i}`);
+  if(!row || !panel) return;
+  row.classList.toggle('open');
+  panel.classList.toggle('open');
+}
 </script>
 
 </body>
