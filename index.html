@@ -113,6 +113,8 @@ nav .icons a:hover{color:var(--red);}
   width:1px;
   background:linear-gradient(to bottom, transparent, rgba(255,43,31,0.55) 12%, rgba(255,43,31,0.55) 88%, transparent);
   z-index:2;
+  transition:left .12s ease-out;
+  pointer-events:none;
 }
 .crosshair-h{
   position:absolute;
@@ -121,6 +123,8 @@ nav .icons a:hover{color:var(--red);}
   height:1px;
   background:linear-gradient(to right, transparent, rgba(255,207,0,0.5) 8%, rgba(255,207,0,0.5) 92%, transparent);
   z-index:2;
+  transition:top .12s ease-out;
+  pointer-events:none;
 }
 .crosshair-tag{
   position:absolute;
@@ -130,6 +134,9 @@ nav .icons a:hover{color:var(--red);}
   letter-spacing:0.1em;
   color:var(--red);
   z-index:3;
+  transition:top .12s ease-out, left .12s ease-out;
+  pointer-events:none;
+  white-space:nowrap;
 }
 
 /* ghost watermark text */
@@ -435,10 +442,10 @@ footer{
   </div>
 </nav>
 
-<section class="hero">
-  <div class="crosshair-v"></div>
-  <div class="crosshair-h"></div>
-  <div class="crosshair-tag">// 33°27′7″ S, 70°40′44″ W</div>
+<section class="hero" id="hero">
+  <div class="crosshair-v" id="crosshairV"></div>
+  <div class="crosshair-h" id="crosshairH"></div>
+  <div class="crosshair-tag" id="crosshairTag">// 33°27′7″ S, 70°40′44″ W</div>
   <div class="ghost-text">creative coder</div>
 
   <div class="hero-caption">piromantico<br>1. adj. Perteneciente o relativo a la piromancia.<br>2. m. y f. Persona que profesa la piromancia.</div>
@@ -599,6 +606,52 @@ function toggleEmbed(i){
   if(!row || !panel) return;
   row.classList.toggle('open');
   panel.classList.toggle('open');
+}
+
+/* ---------- crosshair follows cursor ---------- */
+const hero = document.getElementById('hero');
+const crosshairV = document.getElementById('crosshairV');
+const crosshairH = document.getElementById('crosshairH');
+const crosshairTag = document.getElementById('crosshairTag');
+
+const BASE_LAT = -33.4519; // Santiago, CL
+const BASE_LNG = -70.6789;
+
+function toDMS(deg, isLat){
+  const abs = Math.abs(deg);
+  const d = Math.floor(abs);
+  const minFloat = (abs - d) * 60;
+  const m = Math.floor(minFloat);
+  const s = Math.round((minFloat - m) * 60);
+  const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
+  return `${d}°${m}′${s}″ ${dir}`;
+}
+
+function updateCrosshair(xPct, yPct, xPx, yPx){
+  crosshairV.style.left = xPct + '%';
+  crosshairH.style.top = yPct + '%';
+  crosshairTag.style.left = xPx + 'px';
+  crosshairTag.style.top = yPx + 'px';
+
+  const lat = BASE_LAT + (yPct - 40) * 0.002;
+  const lng = BASE_LNG + (xPct - 42) * 0.002;
+  crosshairTag.textContent = `// ${toDMS(lat, true)}, ${toDMS(lng, false)}`;
+}
+
+if(hero){
+  hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    const xPx = e.clientX - rect.left;
+    const yPx = e.clientY - rect.top;
+    const xPct = (xPx / rect.width) * 100;
+    const yPct = (yPx / rect.height) * 100;
+    updateCrosshair(xPct, yPct, xPx, yPx);
+  });
+
+  hero.addEventListener('mouseleave', () => {
+    updateCrosshair(42, 40, hero.clientWidth * 0.42 + 10, hero.clientHeight * 0.40 - 26);
+    crosshairTag.textContent = '// 33°27′7″ S, 70°40′44″ W';
+  });
 }
 </script>
 
