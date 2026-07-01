@@ -166,6 +166,14 @@ nav .icons a:hover{color:var(--red);}
   margin-top:160px;
 }
 
+.type-cursor{
+  color:var(--red);
+  animation:blinkCursor .8s steps(1) infinite;
+}
+@keyframes blinkCursor{
+  50%{opacity:0;}
+}
+
 .hero-caption.lower{
   color:var(--yellow);
   margin-bottom:18px;
@@ -448,7 +456,7 @@ footer{
   <div class="crosshair-tag" id="crosshairTag">// 33°27′7″ S, 70°40′44″ W</div>
   <div class="ghost-text">creative coder</div>
 
-  <div class="hero-caption">piromantico<br>1. adj. Perteneciente o relativo a la piromancia.<br>2. m. y f. Persona que profesa la piromancia.</div>
+  <div class="hero-caption" id="heroCaption">piromantico<br>1. adj. Perteneciente o relativo a la piromancia.<br>2. m. y f. Persona que profesa la piromancia.</div>
 
   <h1 class="wordmark">piromántico<span class="accent">.</span></h1>
 
@@ -639,19 +647,59 @@ function updateCrosshair(xPct, yPct, xPx, yPx){
 }
 
 if(hero){
-  hero.addEventListener('mousemove', (e) => {
+  function handlePointerMove(clientX, clientY){
     const rect = hero.getBoundingClientRect();
-    const xPx = e.clientX - rect.left;
-    const yPx = e.clientY - rect.top;
+    const xPx = clientX - rect.left;
+    const yPx = clientY - rect.top;
     const xPct = (xPx / rect.width) * 100;
     const yPct = (yPx / rect.height) * 100;
     updateCrosshair(xPct, yPct, xPx, yPx);
-  });
+  }
 
-  hero.addEventListener('mouseleave', () => {
+  function resetCrosshair(){
     updateCrosshair(42, 40, hero.clientWidth * 0.42 + 10, hero.clientHeight * 0.40 - 26);
     crosshairTag.textContent = '// 33°27′7″ S, 70°40′44″ W';
+  }
+
+  // desktop: mouse
+  hero.addEventListener('mousemove', (e) => {
+    handlePointerMove(e.clientX, e.clientY);
   });
+  hero.addEventListener('mouseleave', resetCrosshair);
+
+  // mobile: touch (follows the finger while dragging)
+  hero.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    if(t) handlePointerMove(t.clientX, t.clientY);
+  }, { passive: true });
+
+  hero.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if(t) handlePointerMove(t.clientX, t.clientY);
+  }, { passive: true });
+
+  hero.addEventListener('touchend', resetCrosshair);
+  hero.addEventListener('touchcancel', resetCrosshair);
+}
+
+/* ---------- typewriter effect for the definition ---------- */
+function typewriter(el, text, speed){
+  el.innerHTML = '<span class="type-cursor">▮</span>';
+  let i = 0;
+  const interval = setInterval(() => {
+    i++;
+    const typed = text.slice(0, i).replace(/\n/g, '<br>');
+    el.innerHTML = typed + '<span class="type-cursor">▮</span>';
+    if(i >= text.length){
+      clearInterval(interval);
+    }
+  }, speed);
+}
+
+const heroCaption = document.getElementById('heroCaption');
+if(heroCaption){
+  const definitionText = "piromantico\n1. adj. Perteneciente o relativo a la piromancia.\n2. m. y f. Persona que profesa la piromancia.";
+  setTimeout(() => typewriter(heroCaption, definitionText, 22), 300);
 }
 </script>
 
