@@ -175,9 +175,7 @@ nav .icons a:hover{color:var(--red);}
   color:var(--paper);
   margin-bottom:0.18em;
   text-transform:lowercase;
-  overflow-wrap:break-word;
-  word-break:break-word;
-  max-width:100%;
+  white-space:nowrap;
 }
 .wordmark .accent{color:var(--red);}
 
@@ -214,7 +212,11 @@ nav .icons a:hover{color:var(--red);}
   .hero-caption{margin-left:0; margin-top:120px; max-width:220px;}
   .ghost-text{font-size:clamp(40px,18vw,90px); left:4%;}
   .hero{padding:0 22px;}
-  .wordmark{font-size:clamp(38px, 15vw, 90px);}
+  .wordmark{font-size:9.5vw;}
+}
+
+@media (max-width:400px){
+  .wordmark{font-size:8.5vw;}
 }
 
 /* ---------- SECTION HEADERS ---------- */
@@ -400,9 +402,9 @@ footer{
   <div class="dot"></div>
   <a class="links" href="#info">about</a>
   <div class="icons">
-    <a href=""https://github.com/piromantico aria-label="github">gh</a>
-    <a href="https://www.instagram.com/accounts/edit/" aria-label="instagram">ig</a>
-    <a href="mailto:piromantiico.design@gmail.com" aria-label="mail">mail</a>
+    <a href="#" aria-label="github">gh</a>
+    <a href="#" aria-label="instagram">ig</a>
+    <a href="mailto:tu@email.com" aria-label="mail">mail</a>
   </div>
 </nav>
 
@@ -465,9 +467,9 @@ footer{
   <div class="contact-row">
     <h2><a href="mailto:tu@email.com">hablemos →</a></h2>
     <div class="contact-links">
-      <a href="https://github.com/piromantico">github</a>
+      <a href="#">github</a>
       <a href="https://www.instagram.com/piromantiico/">instagram</a>
-      <a href="mailto:piromantiico.design@gmail.com">email</a>
+      <a href="mailto:tu@email.com">email</a>
     </div>
   </div>
   <div class="foot-bottom">
