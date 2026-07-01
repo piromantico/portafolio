@@ -198,27 +198,13 @@ nav .icons a:hover{color:var(--red);}
   position:relative;
   z-index:3;
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-start;
   align-items:flex-end;
   padding:22px 0 30px;
   border-top:1px solid rgba(236,231,218,0.1);
   font-size:11px;
   letter-spacing:0.06em;
   color:var(--muted);
-}
-.hero-bottom .scroll-hint{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.hero-bottom .bar{
-  width:1px; height:24px;
-  background:linear-gradient(to bottom, var(--red), transparent);
-  animation:scrollMove 1.8s infinite ease-in-out;
-}
-@keyframes scrollMove{
-  0%,100%{opacity:0.3;}
-  50%{opacity:1;}
 }
 
 @media (max-width:760px){
@@ -240,7 +226,7 @@ nav .icons a:hover{color:var(--red);}
   display:flex;
   align-items:baseline;
   gap:18px;
-  margin-bottom:64px;
+  margin-bottom:0;
   border-bottom:1px solid var(--line);
   padding-bottom:20px;
 }
@@ -461,12 +447,10 @@ footer{
 
 <div class="hero-bottom">
     <span>diseño gráfico / editorial / textil / creative coding</span>
-    <div class="scroll-hint"><div class="bar"></div>scroll</div>
-    <span>estación central, cl — 2026</span>
   </div>
 </section>
 
-<section class="section" id="proyectos">
+<section class="section" id="proyectos" style="padding-top:40px;">
   <div class="section-head">
     <span class="num">01 /</span>
     <h2>proyectos</h2>
