@@ -329,22 +329,22 @@ nav .icons a:hover{color:var(--red);}
   max-height:0;
   overflow:hidden;
   border-bottom:1px solid var(--line);
-  transition:max-height .4s ease;
+  transition:max-height .5s ease;
 }
-.embed-wrap.open{max-height:360px;}
+.embed-wrap.open{max-height:6000px;}
 .embed-inner{
-  padding:24px 0 34px;
   display:flex;
-  justify-content:center;
+  flex-direction:column;
+  gap:0;
 }
-.embed-inner iframe{
-  max-width:100%;
-  border:1px solid var(--line);
-  filter:grayscale(0.15);
+.embed-inner img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter:grayscale(0.1);
+  transition:filter .25s;
 }
-@media (max-width:760px){
-  .embed-inner iframe{width:100%; height:280px;}
-}
+.embed-inner img:hover{filter:grayscale(0);}
 
 @media (max-width:760px){
   .grid{grid-template-columns:1fr;}
@@ -519,7 +519,13 @@ const projects = [
     desc: "Control del efecto Slice con gestos de mano (puño → mano abierta) usando ml5.js.",
     tags: ["ml5.js", "hand tracking", "interactivo"],
     url: "#",
-    embed: '<iframe src="https://www.behance.net/embed/project/235510581?ilo0=1" height="316" width="404" allowfullscreen lazyload frameborder="0" allow="clipboard-write" refererPolicy="strict-origin-when-cross-origin"></iframe>'
+    media: [
+      "assets/img/akriila-01.jpg",
+      "assets/img/akriila-02.jpg",
+      "assets/img/akriila-03.jpg",
+      "assets/img/akriila-04.jpg",
+      "assets/img/akriila.gif"
+    ]
   },
   {
     ch: "03",
@@ -551,13 +557,13 @@ const grid = document.getElementById('grid');
 
 function renderCards(){
   grid.innerHTML = projects.map((p, i) => {
-    const hasEmbed = !!p.embed;
-    const rowClick = hasEmbed
+    const hasMedia = Array.isArray(p.media) && p.media.length > 0;
+    const rowClick = hasMedia
       ? `toggleEmbed(${i})`
       : (p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : '');
 
     const row = `
-    <div class="proj-row${hasEmbed ? ' has-embed' : ''}" id="row-${i}" onclick="${rowClick}">
+    <div class="proj-row${hasMedia ? ' has-embed' : ''}" id="row-${i}" onclick="${rowClick}">
       <div class="ch">
         <span>${p.ch}</span>
         <span class="${p.live ? 'live' : ''}">${p.live ? '● live' : '○ draft'}</span>
@@ -576,8 +582,8 @@ function renderCards(){
       </div>
     </div>`;
 
-    const embedPanel = hasEmbed
-      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.embed}</div></div>`
+    const embedPanel = hasMedia
+      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => `<img src="${src}" alt="${p.title}" loading="lazy">`).join('')}</div></div>`
       : '';
 
     return row + embedPanel;
