@@ -829,7 +829,7 @@ function renderCards(){
           ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => {
               const isVideo = /\.(mp4|webm|mov)$/i.test(src);
               return isVideo
-                ? `<video src="${src}" controls playsinline preload="metadata"></video>`
+                ? `<video src="${src}" muted loop playsinline preload="metadata"></video>`
                 : `<img src="${src}" alt="${p.title}" loading="lazy">`;
             }).join('')}</div></div>`
           : ''));
@@ -847,6 +847,17 @@ function toggleEmbed(i){
   if(!row || !panel) return;
   row.classList.toggle('open');
   panel.classList.toggle('open');
+
+  const isOpen = panel.classList.contains('open');
+  const videos = panel.querySelectorAll('video');
+  videos.forEach(v => {
+    if(isOpen){
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  });
 
   const proj = projects[i];
   if(proj.embedType === 'sketch' && proj.sketchFactory && !mountedSketches.has(i)){
