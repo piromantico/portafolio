@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PIROMANTICO — PORTFOLIO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="assets/img/sketches/moho.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -355,7 +357,7 @@ nav .nav-right{
 }
 .embed-inner img:hover{filter:grayscale(0);}
 
-/* p5.js interactive sketch embed (iframe) */
+/* p5.js interactive sketch embed (integrado directamente, sin iframe) */
 .embed-inner .sketch-frame{
   width:100%;
   aspect-ratio:16/9;
@@ -364,6 +366,29 @@ nav .nav-right{
   background:#000;
   position:relative;
   z-index:1000;
+}
+.embed-inner .sketch-holder{
+  width:100%;
+  max-width:500px;
+  aspect-ratio:1/1;
+  margin:0 auto;
+  background:#000;
+  position:relative;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.embed-inner .sketch-holder canvas{
+  display:block;
+}
+.embed-inner .sketch-hint{
+  text-align:center;
+  font-size:11px;
+  color:var(--muted);
+  padding:14px 0 4px;
+  letter-spacing:0.04em;
 }
 
 @media (max-width:760px){
@@ -741,11 +766,11 @@ const projects = [
   {
     ch: "06",
     live: true,
-    title: "Ondas reactivas",
-    desc: "Sketch p5.js interactivo — mové el mouse para generar ondas reactivas en tiempo real",
-    tags: ["p5.js", "interactive"],
-    embedType: "iframe",
-    embedSrc: "https://editor.p5js.org/luxinocte/full/CZXAgGVNv"
+    title: "Moho fisarum",
+    desc: "Simulación de moho fisarum (physarum) en p5.js — cada partícula sigue rastros de luz y genera redes orgánicas emergentes",
+    tags: ["p5.js", "simulation", "interactive"],
+    embedType: "sketch",
+    sketchFactory: "moldSketchFactory"
   }
 ];
 
@@ -755,7 +780,8 @@ function renderCards(){
   grid.innerHTML = projects.map((p, i) => {
     const hasMedia = Array.isArray(p.media) && p.media.length > 0;
     const hasIframe = p.embedType === 'iframe' && p.embedSrc;
-    const hasEmbed = hasMedia || hasIframe;
+    const hasSketch = p.embedType === 'sketch' && p.sketchFactory;
+    const hasEmbed = hasMedia || hasIframe || hasSketch;
     const rowClick = hasEmbed
       ? `toggleEmbed(${i})`
       : (p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : '');
@@ -780,16 +806,20 @@ function renderCards(){
       </div>
     </div>`;
 
-    const embedPanel = hasIframe
-      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><iframe src="${p.embedSrc}" class="sketch-frame" loading="lazy" allow="camera;microphone" title="${p.title}"></iframe></div></div>`
-      : (hasMedia
-        ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => `<img src="${src}" alt="${p.title}" loading="lazy">`).join('')}</div></div>`
-        : '');
+    const embedPanel = hasSketch
+      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><div class="sketch-holder" id="sketch-holder-${i}"></div><div class="sketch-hint">tocá / mové el cursor sobre el lienzo — el moho reacciona a la luz que va dejando</div></div></div>`
+      : (hasIframe
+        ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><iframe src="${p.embedSrc}" class="sketch-frame" loading="lazy" allow="camera;microphone" title="${p.title}"></iframe></div></div>`
+        : (hasMedia
+          ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => `<img src="${src}" alt="${p.title}" loading="lazy">`).join('')}</div></div>`
+          : ''));
 
     return row + embedPanel;
   }).join('');
 }
 renderCards();
+
+const mountedSketches = new Set();
 
 function toggleEmbed(i){
   const row = document.getElementById(`row-${i}`);
@@ -797,6 +827,25 @@ function toggleEmbed(i){
   if(!row || !panel) return;
   row.classList.toggle('open');
   panel.classList.toggle('open');
+
+  const proj = projects[i];
+  if(proj.embedType === 'sketch' && proj.sketchFactory && !mountedSketches.has(i)){
+    mountedSketches.add(i);
+    // pequeño delay para que el panel termine de expandirse y el contenedor
+    // ya tenga su ancho final antes de crear el canvas
+    setTimeout(() => mountSketch(i, proj.sketchFactory), 60);
+  }
+}
+
+function mountSketch(i, factoryName){
+  const holderId = `sketch-holder-${i}`;
+  const holder = document.getElementById(holderId);
+  const factory = window[factoryName];
+  if(!holder || typeof factory !== 'function'){
+    console.error('No se pudo montar el sketch:', factoryName);
+    return;
+  }
+  new p5(factory(holderId));
 }
 
 /* ---------- coordinate crosshair follows the pointer ---------- */
