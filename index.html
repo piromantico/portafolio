@@ -955,6 +955,8 @@ function mountSketch(i, factoryName){
       .then(code => { codeEl.innerHTML = highlightJS(code); })
       .catch(() => { codeEl.textContent = 'no se pudo cargar el código.'; });
   }
+}
+
 /* ---------- coordinate crosshair follows the pointer ---------- */
 const hero = document.getElementById('hero');
 const crosshairV = document.getElementById('crosshairV');
