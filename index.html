@@ -399,6 +399,48 @@ nav .nav-right{
   padding:14px 0 4px;
   letter-spacing:0.04em;
 }
+  .sketch-duo{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  max-width:960px;
+  margin:0 auto;
+}
+.sketch-duo .sketch-holder{
+  width:100%;
+  max-width:none;
+  aspect-ratio:1/1;
+}
+.sketch-code{
+  background:var(--bg-2);
+  border-left:1px solid var(--line);
+  padding:20px 22px;
+  max-height:520px;
+  overflow-y:auto;
+}
+.sketch-code .code-label{
+  font-size:10px;
+  letter-spacing:0.08em;
+  color:var(--red);
+  margin-bottom:10px;
+}
+.sketch-code pre{
+  font-family:'Space Mono', monospace;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--paper);
+  white-space:pre-wrap;
+  word-break:break-word;
+  margin:0;
+}
+.tok-kw{color:var(--red);}
+.tok-num{color:var(--yellow);}
+.tok-cm{color:var(--muted); font-style:italic;}
+.tok-fn{color:var(--ember);}
+
+@media (max-width:760px){
+  .sketch-duo{grid-template-columns:1fr;}
+  .sketch-code{border-left:none; border-top:1px solid var(--line); max-height:360px;}
+}
 
 @media (max-width:760px){
   .grid{grid-template-columns:1fr;}
@@ -826,8 +868,17 @@ function renderCards(){
       </div>
     </div>`;
 
-    const embedPanel = hasSketch
-      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><div class="sketch-holder" id="sketch-holder-${i}"></div><div class="sketch-hint">tocá / mové el cursor sobre el lienzo — el moho reacciona a la luz que va dejando</div></div></div>`
+  const embedPanel = hasSketch
+  ? `<div class="embed-wrap" id="embed-${i}">
+      <div class="sketch-duo">
+        <div class="sketch-holder" id="sketch-holder-${i}"></div>
+        <div class="sketch-code">
+          <div class="code-label">// moho.js</div>
+          <pre><code id="sketch-code-${i}">cargando código…</code></pre>
+        </div>
+      </div>
+      <div class="sketch-hint">clic sobre el lienzo para pausar / reanudar — el moho sigue los rastros de luz que va dejando</div>
+    </div>`
       : (hasIframe
         ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><iframe src="${p.embedSrc}" class="sketch-frame" loading="lazy" allow="camera;microphone" title="${p.title}"></iframe></div></div>`
         : (hasMedia
@@ -872,6 +923,20 @@ function toggleEmbed(i){
     setTimeout(() => mountSketch(i, proj.sketchFactory), 60);
   }
 }
+function highlightJS(code){
+  const esc = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const kw = /\b(class|constructor|function|return|if|else|for|while|new|let|const|var|true|false|this|typeof)\b/g;
+  return esc.split('\n').map(line => {
+    const c = line.indexOf('//');
+    let codePart = c >= 0 ? line.slice(0, c) : line;
+    let commentPart = c >= 0 ? line.slice(c) : '';
+    codePart = codePart.replace(/\bp\.[a-zA-Z]+/g, m => `<span class="tok-fn">${m}</span>`);
+    codePart = codePart.replace(kw, '<span class="tok-kw">$1</span>');
+    codePart = codePart.replace(/\b(\d+\.?\d*)\b/g, '<span class="tok-num">$1</span>');
+    if (commentPart) commentPart = `<span class="tok-cm">${commentPart}</span>`;
+    return codePart + commentPart;
+  }).join('\n');
+}
 
 function mountSketch(i, factoryName){
   const holderId = `sketch-holder-${i}`;
@@ -882,8 +947,14 @@ function mountSketch(i, factoryName){
     return;
   }
   new p5(factory(holderId));
-}
 
+  const codeEl = document.getElementById(`sketch-code-${i}`);
+  if(codeEl){
+    fetch('assets/img/sketches/moho.js')
+      .then(r => r.text())
+      .then(code => { codeEl.innerHTML = highlightJS(code); })
+      .catch(() => { codeEl.textContent = 'no se pudo cargar el código.'; });
+  }
 /* ---------- coordinate crosshair follows the pointer ---------- */
 const hero = document.getElementById('hero');
 const crosshairV = document.getElementById('crosshairV');
