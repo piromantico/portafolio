@@ -355,6 +355,17 @@ nav .nav-right{
 }
 .embed-inner img:hover{filter:grayscale(0);}
 
+/* p5.js interactive sketch embed (iframe) */
+.embed-inner .sketch-frame{
+  width:100%;
+  aspect-ratio:16/9;
+  border:none;
+  display:block;
+  background:#000;
+  position:relative;
+  z-index:1000;
+}
+
 @media (max-width:760px){
   .grid{grid-template-columns:1fr;}
   .section{padding:80px 22px;}
@@ -726,6 +737,15 @@ const projects = [
     desc: "proyecto realizado en p5...",
     tags: ["visuales", "p5.js"],
     url: "#"
+  },
+  {
+    ch: "06",
+    live: true,
+    title: "Ondas reactivas",
+    desc: "Sketch p5.js interactivo — mové el mouse para generar ondas reactivas en tiempo real",
+    tags: ["p5.js", "interactive"],
+    embedType: "iframe",
+    embedSrc: "https://editor.p5js.org/luxinocte/full/CZXAgGVNv"
   }
 ];
 
@@ -734,12 +754,14 @@ const grid = document.getElementById('grid');
 function renderCards(){
   grid.innerHTML = projects.map((p, i) => {
     const hasMedia = Array.isArray(p.media) && p.media.length > 0;
-    const rowClick = hasMedia
+    const hasIframe = p.embedType === 'iframe' && p.embedSrc;
+    const hasEmbed = hasMedia || hasIframe;
+    const rowClick = hasEmbed
       ? `toggleEmbed(${i})`
       : (p.url && p.url !== '#' ? `window.open('${p.url}','_blank')` : '');
 
     const row = `
-    <div class="proj-row${hasMedia ? ' has-embed' : ''}" id="row-${i}" onclick="${rowClick}">
+    <div class="proj-row${hasEmbed ? ' has-embed' : ''}" id="row-${i}" onclick="${rowClick}">
       <div class="ch">
         <span>${p.ch}</span>
         <span class="${p.live ? 'live' : ''}">${p.live ? '● live' : '○ draft'}</span>
@@ -758,9 +780,11 @@ function renderCards(){
       </div>
     </div>`;
 
-    const embedPanel = hasMedia
-      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => `<img src="${src}" alt="${p.title}" loading="lazy">`).join('')}</div></div>`
-      : '';
+    const embedPanel = hasIframe
+      ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner"><iframe src="${p.embedSrc}" class="sketch-frame" loading="lazy" allow="camera;microphone" title="${p.title}"></iframe></div></div>`
+      : (hasMedia
+        ? `<div class="embed-wrap" id="embed-${i}"><div class="embed-inner">${p.media.map(src => `<img src="${src}" alt="${p.title}" loading="lazy">`).join('')}</div></div>`
+        : '');
 
     return row + embedPanel;
   }).join('');
