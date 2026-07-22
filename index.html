@@ -564,19 +564,23 @@ nav .nav-right{
   z-index:2;
 }
 .about-grid p{
-  font-size:15px;
+  font-size:calc(15px * var(--fit-scale, 1));
   line-height:1.9;
   color:var(--muted);
-  margin-bottom:18px;
+  margin-bottom:calc(18px * var(--fit-scale, 1));
 }
 .about-grid p strong{color:var(--paper);}
-.stack-list{display:flex; flex-direction:column; gap:0;}
+.stack-list{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
 .stack-list .row{
   display:flex;
   justify-content:space-between;
-  padding:14px 0;
+  padding:calc(14px * var(--fit-scale, 1)) 0;
   border-bottom:1px solid var(--line);
-  font-size:13px;
+  font-size:calc(13px * var(--fit-scale, 1));
 }
 .stack-list .row span:first-child{color:var(--paper); letter-spacing:0.02em;}
 .stack-list .row span:last-child{color:var(--muted);}
@@ -1128,6 +1132,48 @@ if(heroCaption){
   const definitionText = "piromancia\n1. f. Adivinación que se practica observando el fuego.\n\nromántico, ca\n1. adj. Que exalta el yo y la libertad creadora por encima de la norma; inconformista.";
   setTimeout(() => typewriter(heroCaption, definitionText, 22), 300);
 }
+
+/* ---------- ajustar texto de "info" a la altura de la foto ---------- */
+function fitAboutSection(){
+  const grid = document.querySelector('.about-grid');
+  const photo = document.querySelector('.photo-placeholder');
+  if(!grid || !photo) return;
+
+  // en mobile el layout es de una sola columna, no aplica el ajuste
+  if(window.innerWidth <= 760){
+    grid.style.removeProperty('--fit-scale');
+    return;
+  }
+
+  const textCol = grid.children[1];
+  const stackCol = grid.children[2];
+  if(!textCol || !stackCol) return;
+
+  const targetHeight = photo.offsetHeight;
+  let scale = 1;
+  grid.style.setProperty('--fit-scale', scale);
+
+  let guard = 0;
+  while(
+    (textCol.scrollHeight > targetHeight || stackCol.scrollHeight > targetHeight) &&
+    scale > 0.55 &&
+    guard < 40
+  ){
+    scale -= 0.02;
+    grid.style.setProperty('--fit-scale', scale.toFixed(3));
+    guard++;
+  }
+}
+
+window.addEventListener('load', fitAboutSection);
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(fitAboutSection);
+}
+let aboutResizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(aboutResizeTimer);
+  aboutResizeTimer = setTimeout(fitAboutSection, 150);
+});
 
 /* ---------- reveal al hacer scroll (para el resto de la web) ---------- */
 function initScrollReveal(){
