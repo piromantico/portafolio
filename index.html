@@ -549,18 +549,24 @@ nav .nav-right{
   position:absolute;
   width:14px; height:14px;
   border:1px solid var(--red);
-  z-index:2;
+  z-index:3;
 }
 .photo-placeholder .ph-corner.tl{top:10px; left:10px; border-right:none; border-bottom:none;}
 .photo-placeholder .ph-corner.tr{top:10px; right:10px; border-left:none; border-bottom:none;}
 .photo-placeholder .ph-corner.bl{bottom:10px; left:10px; border-right:none; border-top:none;}
 .photo-placeholder .ph-corner.br{bottom:10px; right:10px; border-left:none; border-top:none;}
-.photo-placeholder img{
+/* el video/imagen llena siempre el placeholder, sin importar su tamaño original */
+.photo-placeholder img,
+.photo-placeholder video{
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
+  max-width:none;
   object-fit:cover;
+  object-position:center;
+  display:block;
   filter:grayscale(0.15) contrast(1.05);
-  position:relative;
   z-index:2;
 }
 .about-grid p{
