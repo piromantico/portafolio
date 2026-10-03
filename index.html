@@ -114,7 +114,7 @@ nav .nav-right{
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
-  padding-bottom:40px;
+  padding-bottom:24px;
   overflow:hidden;
 }
 
@@ -237,7 +237,7 @@ nav .nav-right{
   .crosshair-tag{left:18%;}
   .hero-caption{margin-left:0; margin-top:120px; max-width:220px;}
   .ghost-text{font-size:clamp(40px,18vw,90px); left:4%;}
-  .hero{padding:0 22px 32px; cursor:auto;}
+  .hero{padding:0 22px 20px; cursor:auto;}
   .wordmark{font-size:12.5vw;}
 }
 
@@ -320,9 +320,9 @@ nav .nav-right{
   position:absolute; top:0; left:0;
   z-index:1;
   opacity:0;
-  transition:opacity .15s, transform .15s;
+  transition:opacity .15s, transform .15s, filter .15s;
 }
-.proj-row:hover h3 .ghost.r{color:var(--red); opacity:0.85; transform:translate(4px,-3px);}
+.proj-row.open h3 .ghost.r{color:var(--red); opacity:0.85; transform:translate(4px,-3px); filter:blur(6px);}
 
 .proj-row p{
   margin-top:10px;
@@ -501,7 +501,7 @@ nav .nav-right{
   nav{padding:18px 22px;}
   .proj-row{grid-template-columns:1fr; gap:10px; padding:26px 0;}
   .proj-row .meta{align-items:flex-start; flex-direction:row; justify-content:space-between; width:100%;}
-  .hero{padding:0 22px 32px;}
+  .hero{padding:0 22px 20px;}
 }
 
 /* ---------- ABOUT ---------- */
@@ -675,7 +675,7 @@ footer{
   <h1 class="wordmark" id="wordmark">piromántico<span class="accent">.</span></h1>
 </section>
 
-<section class="section" id="proyectos" style="padding-top:44px; padding-bottom:0;">
+<section class="section" id="proyectos" style="padding-top:12px; padding-bottom:0;">
   <div class="section-head">
     <span class="num">01 /</span>
     <h2>proyectos</h2>
@@ -705,8 +705,6 @@ footer{
     <div class="stack-list">
       <div class="row"><span>áreas</span><span>Diseño gráfico, editorial, creative coding, visuales</span></div>
       <div class="row"><span>software</span><span>Illustrator, Photoshop, InDesign, Touch Designer, After Effects</span></div>
-      <div class="row"><span>lenguajes</span><span>JavaScript, HTML básico</span></div>
-      <div class="row"><span>librerías</span><span>p5.js</span></div>
     </div>
   </div>
 </section>
@@ -1098,10 +1096,12 @@ if(hero){
   function handlePointerMove(clientX, clientY){
     const rect = hero.getBoundingClientRect();
     const xPx = clientX - rect.left;
-    const yPx = clientY - rect.top;
+    // la mira no puede bajar más que el borde inferior del wordmark
+    const wordBottom = wordmarkEl ? wordmarkEl.getBoundingClientRect().bottom - rect.top : rect.height;
+    const yPx = Math.min(clientY - rect.top, wordBottom);
     const xPct = (xPx / rect.width) * 100;
     const yPct = (yPx / rect.height) * 100;
-    applyHeat(computeHeat(clientX, clientY));
+    applyHeat(computeHeat(clientX, rect.top + yPx));
     updateCrosshair(xPct, yPct, xPx, yPx);
   }
 
