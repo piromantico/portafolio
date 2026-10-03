@@ -106,6 +106,7 @@ nav .nav-right{
 
 /* ---------- HERO ---------- */
 .hero{
+  --hot-rgb:255,43,31; /* color de la mira: rojo en reposo, brasa/amarillo cerca del wordmark */
   min-height:100vh;
   position:relative;
   padding:0 40px;
@@ -122,10 +123,18 @@ nav .nav-right{
   top:0; bottom:0;
   left:42%;
   width:1px;
-  background:linear-gradient(to bottom, transparent, rgba(255,43,31,0.55) 12%, rgba(255,43,31,0.55) 88%, transparent);
+  background:linear-gradient(to bottom, transparent, rgba(var(--hot-rgb),0.55) 12%, rgba(var(--hot-rgb),0.55) 88%, transparent);
   z-index:2;
-  transition:left .12s ease-out;
+  transition:left .12s ease-out, opacity .35s ease-out, filter .35s ease-out;
   pointer-events:none;
+  will-change:transform, opacity, filter;
+  /* ceniza: la máscara deshace la línea en parches que suben como humo (ver setSmoke / burnLoop) */
+  --smoke-lo:1; --smoke-mid:1; --smoke-off:0px;
+  -webkit-mask-image:linear-gradient(to bottom, #000 0%, rgba(0,0,0,var(--smoke-lo)) 10%, #000 22%, rgba(0,0,0,var(--smoke-mid)) 34%, rgba(0,0,0,var(--smoke-lo)) 47%, #000 60%, rgba(0,0,0,var(--smoke-mid)) 72%, rgba(0,0,0,var(--smoke-lo)) 84%, #000 100%);
+  mask-image:linear-gradient(to bottom, #000 0%, rgba(0,0,0,var(--smoke-lo)) 10%, #000 22%, rgba(0,0,0,var(--smoke-mid)) 34%, rgba(0,0,0,var(--smoke-lo)) 47%, #000 60%, rgba(0,0,0,var(--smoke-mid)) 72%, rgba(0,0,0,var(--smoke-lo)) 84%, #000 100%);
+  -webkit-mask-size:100% 380px; mask-size:100% 380px;
+  -webkit-mask-repeat:repeat-y; mask-repeat:repeat-y;
+  -webkit-mask-position:0 var(--smoke-off); mask-position:0 var(--smoke-off);
 }
 .crosshair-h{
   position:absolute;
@@ -134,8 +143,15 @@ nav .nav-right{
   height:1px;
   background:linear-gradient(to right, transparent, rgba(236,231,218,0.5) 8%, rgba(236,231,218,0.5) 92%, transparent);
   z-index:2;
-  transition:top .12s ease-out;
+  transition:top .12s ease-out, opacity .35s ease-out, filter .35s ease-out;
   pointer-events:none;
+  will-change:transform, opacity, filter;
+  --smoke-lo:1; --smoke-mid:1; --smoke-off:0px;
+  -webkit-mask-image:linear-gradient(to right, #000 0%, rgba(0,0,0,var(--smoke-lo)) 10%, #000 22%, rgba(0,0,0,var(--smoke-mid)) 34%, rgba(0,0,0,var(--smoke-lo)) 47%, #000 60%, rgba(0,0,0,var(--smoke-mid)) 72%, rgba(0,0,0,var(--smoke-lo)) 84%, #000 100%);
+  mask-image:linear-gradient(to right, #000 0%, rgba(0,0,0,var(--smoke-lo)) 10%, #000 22%, rgba(0,0,0,var(--smoke-mid)) 34%, rgba(0,0,0,var(--smoke-lo)) 47%, #000 60%, rgba(0,0,0,var(--smoke-mid)) 72%, rgba(0,0,0,var(--smoke-lo)) 84%, #000 100%);
+  -webkit-mask-size:380px 100%; mask-size:380px 100%;
+  -webkit-mask-repeat:repeat-x; mask-repeat:repeat-x;
+  -webkit-mask-position:var(--smoke-off) 0; mask-position:var(--smoke-off) 0;
 }
 .crosshair-tag{
   position:absolute;
@@ -143,7 +159,7 @@ nav .nav-right{
   transform:translate(10px,-26px);
   font-size:10px;
   letter-spacing:0.1em;
-  color:var(--red);
+  color:rgb(var(--hot-rgb));
   z-index:3;
   transition:top .12s ease-out, left .12s ease-out;
   pointer-events:none;
@@ -206,7 +222,7 @@ nav .nav-right{
   filter:none;
   opacity:0;
   transform:translateY(28px);
-  transition:opacity 1.1s ease, transform 1.1s var(--ease-smooth), filter .3s;
+  transition:opacity 1.1s ease, transform 1.1s var(--ease-smooth), filter .3s, text-shadow .15s ease-out;
 }
 .wordmark.hero-in{
   opacity:1;
@@ -443,7 +459,7 @@ nav .nav-right{
   padding:14px 0 4px;
   letter-spacing:0.04em;
 }
-  .sketch-duo{
+.sketch-duo{
   display:grid;
   grid-template-columns:1fr 1fr;
   max-width:960px;
@@ -587,13 +603,20 @@ nav .nav-right{
 .stack-list .row{
   display:flex;
   justify-content:space-between;
+  gap:16px;
   padding:calc(14px * var(--fit-scale, 1)) 0;
   border-bottom:1px solid var(--line);
   font-size:calc(13px * var(--fit-scale, 1));
 }
 .stack-list .row span:first-child{color:var(--paper); letter-spacing:0.02em;}
-.stack-list .row span:last-child{color:var(--muted);}
-@media (max-width:760px){.about-grid{grid-template-columns:1fr; gap:36px;} .photo-placeholder{max-width:220px;}}
+.stack-list .row span:last-child{color:var(--muted); text-align:right;}
+@media (max-width:760px){
+  .about-grid{grid-template-columns:1fr; gap:36px;}
+  .photo-placeholder{max-width:220px;}
+  /* en celular la etiqueta va arriba y el valor debajo, para que textos largos no se peguen */
+  .stack-list .row{flex-direction:column; gap:4px;}
+  .stack-list .row span:last-child{text-align:left;}
+}
 
 /* ---------- REVEAL ON SCROLL (general) ---------- */
 .reveal{
@@ -700,8 +723,8 @@ footer{
     </div>
     <div class="stack-list">
       <div class="row"><span>estudios</span><span>Diseño, UDP — 2° año</span></div>
-      <div class="row"><span>áreas</span><span>Diseño gráfico, editorial, creative coding</span></div>
-      <div class="row"><span>software</span><span>Illustrator, Photoshop, InDesign</span></div>
+      <div class="row"><span>áreas</span><span>Diseño gráfico, editorial, creative coding, visuales</span></div>
+      <div class="row"><span>software</span><span>Illustrator, Photoshop, InDesign, Touch Designer, After Effects</span></div>
       <div class="row"><span>lenguajes</span><span>JavaScript, HTML básico</span></div>
       <div class="row"><span>librerías</span><span>p5.js</span></div>
     </div>
@@ -732,11 +755,11 @@ const projects = [
     desc: "Vinilo 'Mutant - Arca', reimaginado bajo la identidad visual de Barbara Kruger",
     tags: ["ARCA", "MUTANT", "BARBARA KRUGER"],
     url: "#",
-media: [
-"assets/img/arca1.png",
-"assets/img/arca2.png",
-"assets/img/arca3.png"
-]
+    media: [
+      "assets/img/arca1.png",
+      "assets/img/arca2.png",
+      "assets/img/arca3.png"
+    ]
   },
   {
     ch: "02",
@@ -793,13 +816,13 @@ media: [
     desc: "Poster inspirado en canción 'London life - fakemink",
     tags: ["affinity", "fakemink"],
     url: "#",
-media: [
+    media: [
       "assets/img/fkmink1.png",
       "assets/img/fkmink2.png",
       "assets/img/fkmink3.png"
     ]
   },
-    {
+  {
     ch: "06",
     live: true,
     title: "Moho fisarum",
@@ -818,7 +841,7 @@ media: [
     media: [
       "assets/img/oculto1.PNG",
       "assets/img/oculto2.png",
-      "assets/img/oculto3.PNG" 
+      "assets/img/oculto3.PNG"
     ]
   }
 ];
@@ -855,8 +878,8 @@ function renderCards(){
       </div>
     </div>`;
 
-  const embedPanel = hasSketch
-  ? `<div class="embed-wrap" id="embed-${i}">
+    const embedPanel = hasSketch
+      ? `<div class="embed-wrap" id="embed-${i}">
       <div class="sketch-duo">
         <div class="sketch-holder" id="sketch-holder-${i}"></div>
         <div class="sketch-code">
@@ -944,14 +967,26 @@ function mountSketch(i, factoryName){
   }
 }
 
-/* ---------- coordinate crosshair follows the pointer ---------- */
+/* ---------- mira de coordenadas: sigue el puntero y se quema cerca del wordmark ----------
+   Lejos del wordmark es un instrumento preciso (la regla).
+   Cerca, las coordenadas se corrompen, las líneas se deshacen como ceniza, el color pasa de rojo a brasa y
+   el wordmark brilla (la ruptura). Al alejarse vuelve a ser exacta. */
 const hero = document.getElementById('hero');
 const crosshairV = document.getElementById('crosshairV');
 const crosshairH = document.getElementById('crosshairH');
 const crosshairTag = document.getElementById('crosshairTag');
+const wordmarkEl = document.getElementById('wordmark');
 
 const BASE_LAT = -33.4519; // Santiago, CL
 const BASE_LNG = -70.6789;
+const DEFAULT_COORDS = '// 33°27′7″ S, 70°40′44″ W';
+
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let cleanCoords = DEFAULT_COORDS; // texto exacto, sin corromper
+let heat = 0;                     // 0 = lejos del wordmark, 1 = sobre el wordmark
+let burnRAF = null;
+let lastTick = 0;
 
 function toDMS(deg, isLat){
   const abs = Math.abs(deg);
@@ -963,6 +998,102 @@ function toDMS(deg, isLat){
   return `${d}°${m}′${s}″ ${dir}`;
 }
 
+/* corrompe dígitos y letras de dirección según qué tan cerca del fuego esté */
+const GLITCH_CHARS = '0123456789#%?/\\';
+function corrupt(str, amount){
+  return str.replace(/[0-9NSEW]/g, ch => {
+    if(Math.random() >= amount) return ch;
+    return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+  });
+}
+
+function renderTag(){
+  crosshairTag.textContent = (heat > 0.05 && !reduceMotion)
+    ? corrupt(cleanCoords, heat * 0.85)
+    : cleanCoords;
+}
+
+/* rojo → brasa → amarillo, según el calor */
+const HOT_STOPS = [[255,43,31],[255,122,26],[255,207,0]];
+function hotColor(h){
+  const t = h * 2;
+  const i = Math.min(Math.floor(t), 1);
+  const f = t - i;
+  const a = HOT_STOPS[i], b = HOT_STOPS[i + 1];
+  return a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(',');
+}
+
+/* distancia del puntero al rectángulo del wordmark → calor suavizado */
+function computeHeat(clientX, clientY){
+  if(!wordmarkEl) return 0;
+  const r = wordmarkEl.getBoundingClientRect();
+  const dx = Math.max(r.left - clientX, 0, clientX - r.right);
+  const dy = Math.max(r.top - clientY, 0, clientY - r.bottom);
+  const dist = Math.hypot(dx, dy);
+  const range = Math.max(160, Math.min(hero.clientHeight * 0.35, 280));
+  const raw = 1 - Math.min(dist / range, 1);
+  return raw * raw * (3 - 2 * raw); // smoothstep
+}
+
+/* ceniza: las líneas se desvanecen, se desenfocan un poco y se deshacen en parches que suben como humo */
+function setSmoke(h){
+  const lo = (1 - h * 0.8).toFixed(2);
+  const mid = (1 - h * 0.4).toFixed(2);
+  [crosshairV, crosshairH].forEach(line => {
+    line.style.opacity = (1 - h * 0.4).toFixed(2);
+    line.style.filter = h > 0.02 ? `blur(${(h * 1.2).toFixed(2)}px)` : '';
+    line.style.setProperty('--smoke-lo', lo);
+    line.style.setProperty('--smoke-mid', mid);
+  });
+}
+
+function burnLoop(t){
+  if(heat <= 0.02){ stopBurn(); return; }
+  // el humo sube de forma continua
+  crosshairV.style.setProperty('--smoke-off', (-(t * 0.04) % 380).toFixed(1) + 'px');
+  crosshairH.style.setProperty('--smoke-off', ((t * 0.03) % 380).toFixed(1) + 'px');
+  if(t - lastTick > 70){
+    lastTick = t;
+    const j = heat * 2.5;
+    crosshairV.style.transform = `translateX(${((Math.random() - 0.5) * j).toFixed(2)}px)`;
+    crosshairH.style.transform = `translateY(${((Math.random() - 0.5) * j).toFixed(2)}px)`;
+    const base = 1 - heat * 0.4;
+    crosshairV.style.opacity = (base - Math.random() * heat * 0.1).toFixed(2);
+    crosshairH.style.opacity = (base - Math.random() * heat * 0.1).toFixed(2);
+    renderTag();
+  }
+  burnRAF = requestAnimationFrame(burnLoop);
+}
+
+function stopBurn(){
+  if(burnRAF){ cancelAnimationFrame(burnRAF); burnRAF = null; }
+  [crosshairV, crosshairH].forEach(line => {
+    line.style.transform = '';
+    line.style.opacity = '';
+    line.style.filter = '';
+    line.style.removeProperty('--smoke-lo');
+    line.style.removeProperty('--smoke-mid');
+    line.style.removeProperty('--smoke-off');
+  });
+  renderTag();
+}
+
+function applyHeat(h){
+  heat = h;
+  hero.style.setProperty('--hot-rgb', hotColor(h));
+  if(wordmarkEl){
+    wordmarkEl.style.textShadow = h > 0.02
+      ? `0 0 ${(h * 28).toFixed(1)}px rgba(255,122,26,${(h * 0.5).toFixed(2)})`
+      : '';
+  }
+  if(h > 0.02){
+    setSmoke(h);
+    if(!burnRAF && !reduceMotion) burnRAF = requestAnimationFrame(burnLoop);
+  } else {
+    stopBurn();
+  }
+}
+
 function updateCrosshair(xPct, yPct, xPx, yPx){
   crosshairV.style.left = xPct + '%';
   crosshairH.style.top = yPct + '%';
@@ -971,13 +1102,16 @@ function updateCrosshair(xPct, yPct, xPx, yPx){
 
   const lat = BASE_LAT + (yPct - 40) * 0.002;
   const lng = BASE_LNG + (xPct - 42) * 0.002;
-  crosshairTag.textContent = `// ${toDMS(lat, true)}, ${toDMS(lng, false)}`;
+  cleanCoords = `// ${toDMS(lat, true)}, ${toDMS(lng, false)}`;
+  renderTag();
 }
 
 function resetCrosshair(){
   if(!hero) return;
+  applyHeat(0);
   updateCrosshair(42, 40, hero.clientWidth * 0.42 + 10, hero.clientHeight * 0.40 - 26);
-  crosshairTag.textContent = '// 33°27′7″ S, 70°40′44″ W';
+  cleanCoords = DEFAULT_COORDS;
+  renderTag();
 }
 
 if(hero){
@@ -987,6 +1121,7 @@ if(hero){
     const yPx = clientY - rect.top;
     const xPct = (xPx / rect.width) * 100;
     const yPct = (yPx / rect.height) * 100;
+    applyHeat(computeHeat(clientX, clientY));
     updateCrosshair(xPct, yPct, xPx, yPx);
   }
 
